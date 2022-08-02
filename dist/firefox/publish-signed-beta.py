@@ -52,26 +52,26 @@ match = re.search('^(\d+\.\d+\.\d+)(?:(b|rc)(\d+))?$', tag_version)
 if not match:
     print('Error: Invalid version string.')
     exit(1)
-ext_version = match.group(1);
-if match.group(2):
-    revision = int(match.group(3))
-    if match.group(2) == 'rc':
+ext_version = match[1];
+if match[2]:
+    revision = int(match[3])
+    if match[2] == 'rc':
         revision += 100;
-    ext_version += '.' + str(revision)
+    ext_version += f'.{revision}'
 
 extension_id = 'uBlock0@raymondhill.net'
 tmpdir = tempfile.TemporaryDirectory()
-raw_xpi_filename = 'uBlock0_' + tag_version + '.firefox.xpi'
+raw_xpi_filename = f'uBlock0_{tag_version}.firefox.xpi'
 raw_xpi_filepath = os.path.join(tmpdir.name, raw_xpi_filename)
 unsigned_xpi_filepath = os.path.join(tmpdir.name, 'uBlock0.firefox.unsigned.xpi')
-signed_xpi_filename = 'uBlock0_' + tag_version + '.firefox.signed.xpi'
+signed_xpi_filename = f'uBlock0_{tag_version}.firefox.signed.xpi'
 signed_xpi_filepath = os.path.join(tmpdir.name, signed_xpi_filename)
 github_owner = 'gorhill'
 github_repo = 'uBlock'
 
 # Load/save auth secrets
 # The build directory is excluded from git
-ubo_secrets = dict()
+ubo_secrets = {}
 ubo_secrets_filename = os.path.join(projdir, 'dist', 'build', 'ubo_secrets')
 if os.path.isfile(ubo_secrets_filename):
     with open(ubo_secrets_filename) as f:
@@ -98,7 +98,7 @@ def input_secret(prompt, token):
 
 # GitHub API token
 github_token = input_secret('Github token', 'github_token')
-github_auth = 'token ' + github_token
+github_auth = f'token {github_token}'
 
 #
 # Get metadata from GitHub about the release
@@ -190,7 +190,7 @@ def get_jwt_auth():
         'iat': datetime.datetime.utcnow(),
         'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=15),
     }
-    return 'JWT ' + jwt.encode(jwt_payload, amo_secret).decode()
+    return f'JWT {jwt.encode(jwt_payload, amo_secret).decode()}'
 
 print('Ask AMO to sign self-hosted xpi package...')
 with open(unsigned_xpi_filepath, 'rb') as f:
@@ -265,7 +265,10 @@ with open(unsigned_xpi_filepath, 'rb') as f:
 # https://developer.github.com/v3/repos/releases/#upload-a-release-asset
 print('Uploading signed self-hosted xpi package to GitHub...')
 with open(signed_xpi_filepath, 'rb') as f:
-    url = release_info['upload_url'].replace('{?name,label}', '?name=' + signed_xpi_filename)
+    url = release_info['upload_url'].replace(
+        '{?name,label}', f'?name={signed_xpi_filename}'
+    )
+
     headers = {
         'Authorization': github_auth,
         'Content-Type': 'application/zip',

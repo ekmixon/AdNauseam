@@ -20,11 +20,7 @@ manifest_out_file = os.path.join(build_dir, 'manifest.json')
 with open(manifest_out_file) as f:
     manifest_out = json.load(f)
 
-# manifest_out['version'] = version
-
-# Development build? If so, modify name accordingly.
-match = re.search('^\d+\.\d+\.\d+\.\d+$', version)
-if match:
+if match := re.search('^\d+\.\d+\.\d+\.\d+$', version):
     manifest_out['name'] += ' development build'
     manifest_out['short_name'] += ' dev build'
     manifest_out['browser_action']['default_title'] += ' dev build'

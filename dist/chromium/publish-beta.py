@@ -39,14 +39,14 @@ if not re.search('^\d+\.\d+\.\d+(b|rc)\d+$', version):
 
 cs_extension_id = 'cgbcahbpdhpcegmbfconppldiemgcoii'
 tmpdir = tempfile.TemporaryDirectory()
-raw_zip_filename = 'uBlock0_' + version + '.chromium.zip'
+raw_zip_filename = f'uBlock0_{version}.chromium.zip'
 raw_zip_filepath = os.path.join(tmpdir.name, raw_zip_filename)
 github_owner = 'gorhill'
 github_repo = 'uBlock'
 
 # Load/save auth secrets
 # The build directory is excluded from git
-ubo_secrets = dict()
+ubo_secrets = {}
 ubo_secrets_filename = os.path.join(projdir, 'dist', 'build', 'ubo_secrets')
 if os.path.isfile(ubo_secrets_filename):
     with open(ubo_secrets_filename) as f:
@@ -74,7 +74,7 @@ def input_secret(prompt, token):
 
 # GitHub API token
 github_token = input_secret('Github token', 'github_token')
-github_auth = 'token ' + github_token
+github_auth = f'token {github_token}'
 
 #
 # Get metadata from GitHub about the release
